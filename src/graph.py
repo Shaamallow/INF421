@@ -18,7 +18,7 @@ class GraphVisualization:
           
     # addEdge function inputs the vertices of an
     # edge and appends it to the visual list
-    def addEdge(self, a, b):
+    def addEdge(self, a, b,weight=None):
         temp = [a, b]
         self.visual.append(temp)
           
@@ -32,7 +32,7 @@ class GraphVisualization:
         G.add_edges_from(self.visual)
         nx.draw_networkx(G)
         plt.show()
-  
+
 # Driver code
 G = GraphVisualization()
 G.addEdge(0, 2)
