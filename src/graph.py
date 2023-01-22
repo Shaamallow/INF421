@@ -173,7 +173,7 @@ def openGraph(file, color = None) :
             data = lines.split()
             n,m = int(data[0]), int(data[1])
             for i in range(n) :
-                graph.addNode(Node(i))
+                graph.addNode(Node(i+1))
         elif j <= m :
             data = lines.split()
             graph.addEdge(graph.nodes[int(data[0])-1], graph.nodes[int(data[1])-1], weight = int(data[2]), color = color)
