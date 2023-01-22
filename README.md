@@ -35,6 +35,6 @@ Pour desactiver l'envrionnement virtuel :
 
 ### Remarques : 
 
-J'ai pas trop les equivalents Windows donc je te conseille de faire un peu de recherche. Y'a un fichier .gitignore dans le repo ca correpsond à des règles en plus pour que git copie pas l'historique de certains fichiers. En gros je lui demande de pas copier mon environnemnt virtuel, tout le monde sait qu'il est la mais pas besoin d'allourdir le projet en copiant tout l'historique quoi, je gère ca à côté avec pip :happy:
+J'ai pas trop les equivalents Windows donc je te conseille de faire un peu de recherche. Y'a un fichier .gitignore dans le repo ca correpsond à des règles en plus pour que git copie pas l'historique de certains fichiers. En gros je lui demande de pas copier mon environnemnt virtuel, tout le monde sait qu'il est la mais pas besoin d'allourdir le projet en copiant tout l'historique quoi, je gère ca à côté avec pip :blush:
 
 Bon courage et hesite pas à me MP si besoin Martin.
