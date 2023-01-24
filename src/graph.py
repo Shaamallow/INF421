@@ -77,7 +77,7 @@ class GraphVisualization:
         """
 
         # Add edge to the graph
-        self.G.add_edge(a.ID,b.ID)
+        self.G.add_edge(a.ID,b.ID, weight=weight, color=color)
 
         # Add edge to the list
         self.edges.append(Edge(a,b,weight,color))
@@ -184,15 +184,67 @@ def file2Graph(path):
 
     return Graph
 
+# Can't visualise graph 2 to 9 => too big, more than 100 000 Nodes...
+
+# --- Display Both Graphs and MST ---
+
+def compareGraphs(Graph, **kwargs):
+    """
+    Input : 
+    - Graph : GraphVisualization object
+    - display_MST : Boolean (default False)
+    - display_weights : Boolean (default False)
+    - display_weights_MST : Boolean (default False)    
+
+    Output: 
+    - Visualize both the Graph and the Minimum Spanning Tree
+    """
+
+    # Get arguments
+    display_MST = kwargs.get('display_MST', False)
+    display_weights = kwargs.get('display_weights', False)
+    display_weights_MST = kwargs.get('display_weights_MST', False)
+
+
+    if display_MST:
+        # Create a new Graph visualization object corresponding to the MST of the Graph
+        MST = Graph.Kruskal()
+
+    # -- Caracteristics of the Graph --
+
+    # Position of the nodes
+    # get the position of the nodes once and for all 
+    pos = nx.spring_layout(Graph.G)
+
+    # Edges of the Graph
+        # weights
+
+    edge_labels = {}
+    if display_weights:
+        edge_labels = nx.get_edge_attributes(Graph.G,'weight')
+
+    edge_labels_MST = {}
+    if display_weights_MST:
+        edge_labels_MST = nx.get_edge_attributes(MST.G,'weight')
+
+    # Visualize
+    plt.figure(1)
+    nx.draw_networkx(Graph.G, pos=pos)
+    nx.draw_networkx_edge_labels(Graph.G, pos, edge_labels)
+
+    if display_MST:
+        plt.figure(2)
+        nx.draw_networkx(MST.G, node_color='r', edge_color='r',pos=pos)
+        nx.draw_networkx_edge_labels(Graph.G, pos, edge_labels_MST)
+    
+    plt.show()
+
 # RUN TEST on  ./tests/tests/itinerariesX.in
 # with X from 0 to 9
 path = 'tests/tests/itineraries.'
 
-ID = 4
-print('Test ' + str(ID))
+ID = 1
+#print('Test ' + str(ID))
 Graph = file2Graph(path + str(ID) + '.in')
 #Graph.visualize()
-MST = Graph.Kruskal()
-MST.visualize()
-
-# Can't visualise graph 2 to 9 => too big, more than 100 000 Nodes...
+compareGraphs(Graph, display_MST = True, display_weights_MST = True)
