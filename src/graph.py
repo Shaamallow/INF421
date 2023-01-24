@@ -195,6 +195,7 @@ def compareGraphs(Graph, **kwargs):
     - display_MST : Boolean (default False)
     - display_weights : Boolean (default False)
     - display_weights_MST : Boolean (default False)    
+    - same_pos : Boolean (default False)
 
     Output: 
     - Visualize both the Graph and the Minimum Spanning Tree
@@ -204,6 +205,7 @@ def compareGraphs(Graph, **kwargs):
     display_MST = kwargs.get('display_MST', False)
     display_weights = kwargs.get('display_weights', False)
     display_weights_MST = kwargs.get('display_weights_MST', False)
+    same_pos = kwargs.get('same_pos', False)
 
 
     if display_MST:
@@ -214,6 +216,7 @@ def compareGraphs(Graph, **kwargs):
 
     # Position of the nodes
     # get the position of the nodes once and for all 
+
     pos = nx.spring_layout(Graph.G)
 
     # Edges of the Graph
@@ -234,6 +237,8 @@ def compareGraphs(Graph, **kwargs):
 
     if display_MST:
         plt.figure(2)
+        if not(same_pos):
+            pos = nx.spring_layout(MST.G)
         nx.draw_networkx(MST.G, node_color='r', edge_color='r',pos=pos)
         nx.draw_networkx_edge_labels(Graph.G, pos, edge_labels_MST)
     
@@ -247,4 +252,4 @@ ID = 1
 #print('Test ' + str(ID))
 Graph = file2Graph(path + str(ID) + '.in')
 #Graph.visualize()
-compareGraphs(Graph, display_MST = True, display_weights_MST = True)
+compareGraphs(Graph, display_MST = True, display_weights_MST = True, same_pos = False)
