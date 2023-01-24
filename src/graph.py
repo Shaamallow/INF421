@@ -85,18 +85,25 @@ class GraphVisualization:
         # Add 2 Nodes with no parenting
             # Check if the node already exist
 
-        a_in = False
+        # REMOVE AUTO ADDING NODES TO GRAPH => Too long to compute
+        # ADD NODES TO GRAPH BEFORE ADDING EDGES
+        """ a_in = False
         b_in = False
+        i = 0
         for node in self.nodes:
+
+            print(str(i) + '/' + str(len(self.nodes)))
+
             if node.ID == a.ID:
                 a_in = True
             if node.ID == b.ID:
                 b_in = True
+            i+=1
 
         if not a_in:
             self.nodes.append(a)
         if not b_in:
-            self.nodes.append(b)
+            self.nodes.append(b) """
           
     # visualize function draws the graph with matplotlib
     def visualize(self):
@@ -134,83 +141,58 @@ class GraphVisualization:
 
         return MST
 
+# --- Open File and create Graph ---
 
-# Driver code
-""" Graph = GraphVisualization()
-Graph.addEdge(0, 2)
-Graph.addNode(5)
-Graph.addNode(6)
-Graph.addEdge(5, 6)
-Graph.visualize()
+def file2Graph(path):
+    """
+    Return a graph from a file
+    """
 
-print(Graph.getNodes())
-for element in Graph.nodes:
-    print(element)
+    # Open test file 
+    file = open(path, 'r')
+    lines = file.readlines()
 
-for element in Graph.edges:
-    print(element)
+    entry = []
+    for line in lines:
+        entry.append(line.strip().split())
 
-NodeA = Node(0)
-NodeB = Node(1)
-NodeC = Node(2)
-NodeD = Node(3)
+    # Close file
+    file.close()
 
-NodeA.union(NodeB)
-print(NodeA.find().ID)
-NodeB.union(NodeC)
-NodeD.union(NodeC)
+    # Get Number of Nodes and Edges (n,m)
+    n = int(entry[0][0])
+    m = int(entry[0][1])
 
-print(NodeB.find().ID)
-print(NodeC.find().ID)
-NodeC.union(NodeD)
-print(NodeD.find().ID) """
+    # remove first line
+    entry.pop(0)
+
+    # Create Graph
+    Graph = GraphVisualization()
+
+    # Add Nodes
+    for i in range(n):
+        Graph.addNode(Node(i+1))
+
+    # Add Edges
+    for i in range(m):
+        Node_a = int(entry[i][0])
+        Node_b = int(entry[i][1])
+        weight = int(entry[i][2])
+        a = Graph.nodes[Node_a-1]
+        b = Graph.nodes[Node_b-1]
+        Graph.addEdge(a,b,weight)
+
+    return Graph
 
 # RUN TEST on  ./tests/tests/itinerariesX.in
 # with X from 0 to 9
-path = os.getcwd()
-# Open test file 
-ID = 1
-file = open('tests/tests/itineraries.'+ str(ID) +'.in', 'r')
-lines = file.readlines()
+path = 'tests/tests/itineraries.'
 
-entry = []
-for line in lines:
-    entry.append(line.strip().split())
-
-# Close file 
-file.close()
-
-#print(entry)
-
-n = int(entry[0][0])
-m = int(entry[0][1])
-
-# remove first line
-entry.pop(0)
-
-# Create Graph
-Graph = GraphVisualization()
-
-# Add Nodes
-for i in range(n):
-    Graph.addNode(Node(i+1))
-
-# Add Edges
-for i in range(m):
-    Node_a = int(entry[i][0])
-    Node_b = int(entry[i][1])
-    weight = int(entry[i][2])
-    a = Graph.nodes[Node_a-1]
-    b = Graph.nodes[Node_b-1]
-    Graph.addEdge(a,b,weight)
-
-for element in Graph.edges:
-    print(element)
-
-Graph.visualize()
-
-# MST 
-
+ID = 4
+print('Test ' + str(ID))
+Graph = file2Graph(path + str(ID) + '.in')
+#Graph.visualize()
 MST = Graph.Kruskal()
-
 MST.visualize()
+
+# Can't visualise graph 2 to 9 => too big, more than 100 000 Nodes...
