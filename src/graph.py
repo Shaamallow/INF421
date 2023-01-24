@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 # DOC :
 #[LINK](https://networkx.org/documentation/stable/tutorial.html)
-  
+
 
 # Define a Node Class for Union Find Structure
 class Node:
@@ -93,6 +93,32 @@ class GraphVisualization:
         Return all nodes of the graph
         """
         return self.G.nodes()
+
+    def getNeighbors(self, node : Node) :
+        """
+        Return all node neighbors of a node
+        """
+        res = []
+        for x in self.edges :
+            if x.a.ID == node.ID :
+                res.append(x.b)
+        return res
+
+    def getEdge(self, a : Node, b : Node) :
+        """
+        Return the edge between a and b
+        """
+        for x in self.edges :
+            if x.a.ID == a.ID and x.b.ID == b.ID or x.a.ID == b.ID and x.b.ID == a.ID :
+                return x
+
+    def getNode(self, Id) :
+        """
+        Return the node with the ID Id
+        """
+        for x in self.nodes :
+            if x.ID == Id :
+                return x
 
 
 
@@ -184,4 +210,72 @@ def openGraph(file, color = None) :
     return graph
 
 
-(kruskal(openGraph(r'C:\Users\marti\Downloads\tests\tests\itineraries.1.in'))).visualize()
+(kruskal(openGraph(r'C:\Users\marti\Downloads\tests\tests\itineraries.0.in'))).visualize()
+
+def task_v1(graph, u : Node, v : Node) :
+    """
+    Return the most pleasant path between u and v
+    """
+    if u == v :
+        return [u]
+    MST = kruskal(graph)
+    # Find the path between u and v
+    path = [[] for i in range(len(MST.nodes))]
+    neighbors = []
+    flag = False
+    for n in MST.getNeighbors(u) :
+        neighbors.append(n)
+        path[n.ID-1].append(u)
+        path[n.ID - 1].append(n)
+    while not flag and len(neighbors) > 0 :
+        nod = neighbors.pop(0)
+        for n in MST.getNeighbors(nod) :
+            if n not in path[nod.ID-1] :
+                neighbors.append(n)
+                path[n.ID-1] = path[nod.ID-1] + [n]
+            if n == v :
+                flag = True
+                break
+            
+    return  path[v.ID-1] 
+
+
+grap = openGraph(r'C:\Users\marti\Downloads\tests\tests\itineraries.0.in')
+print([grap.nodes[i].ID for i in range(len(grap.nodes))])
+it = task_v1(grap, grap.getNode(2), grap.getNode(9))
+for i in it :
+    print(i.ID)
+r"""
+
+def itineraries_v1(file, file_results) :
+    graph = openGraph(file)
+    tree = kruskal(graph)
+    f = open(file, 'r')
+    j = 0
+    queries = []
+    for lines in f :
+        if j == 0 :
+            data = lines.split()
+            n,m = int(data[0]), int(data[1])
+        j += 1
+        if j > m + 2 :
+            data = lines.split()
+            queries.append((data[0], data[1]))
+    f.close()
+
+    res = open(file_results, 'w')
+    for i in queries :
+        print(i[0], i[1])
+        print(tree.getNode(int(i[0])).ID, tree.getNode(int(i[1])).ID)
+        answer = task_v1(tree, tree.getNode(int(i[0])), tree.getNode(int(i[1])))
+        max = tree.getEdge(answer[0], answer[1]).weight
+        for i in range(2, len(answer)) :
+            max = max(max, tree.getEdge(answer[i-1], answer[i]).weight)
+        res.write(str(max) + '\n')
+    res.close()
+
+itineraries_v1(r'C:\Users\marti\Downloads\tests\tests\itineraries.0.in', r'C:\Users\marti\Documents\travail\.X\projet info\itineraries.out.txt)')
+
+        
+        
+"""
