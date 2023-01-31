@@ -1,22 +1,21 @@
-# Use lib networkx and matplotlib to display graph 
+# Use lib networkx and matplotlib to display graph
 
 import networkx as nx
 import matplotlib.pyplot as plt
-import os 
 
 # DOC :
-#[LINK](https://networkx.org/documentation/stable/tutorial.html)
+# [LINK](https://networkx.org/documentation/stable/tutorial.html)
 
 
 class Node:
 
-    def __init__ (self, ID, parent=None):
+    def __init__(self, ID, parent=None):
         self.ID = ID
         if parent == None:
             self.parent = self
         else:
             self.parent = parent
-    
+
     def find(self):
         if self.parent != self:
             self.parent = self.parent.find()
@@ -27,11 +26,11 @@ class Node:
         root1 = self.find()
         root2 = node.find()
         root1.parent = root2
-    
+
     def __str__(self):
         return 'Node ' + str(self.ID)
 
-    def __eq__(self,obj):
+    def __eq__(self, obj):
         """
         Overriding the default Equals behavior
         Compare ID of Nodes
@@ -40,10 +39,12 @@ class Node:
 
         return self.ID == obj.ID
 
-# Define an Edge Class 
+# Define an Edge Class
+
+
 class Edge():
 
-    def __init__(self, a : Node, b : Node, weight=None, color=None):
+    def __init__(self, a: Node, b: Node, weight=None, color=None):
         self.a = a
         self.b = b
         self.weight = weight
@@ -62,20 +63,22 @@ class Edge():
         Depends on the Node method __eq__ 
         """
 
-        nodes_eq = (self.a == obj.a and self.b == obj.b) or (self.a == obj.b and self.b == obj.a)
-        weights_eq = (self.weight == obj.weight) or (self.weight == None) or (obj.weight == None)
-        #colors_eq = (self.color == obj.color) or (self.color == None) or (obj.color == None)
+        nodes_eq = (self.a == obj.a and self.b == obj.b) or (
+            self.a == obj.b and self.b == obj.a)
+        weights_eq = (self.weight == obj.weight) or (
+            self.weight == None) or (obj.weight == None)
+        # colors_eq = (self.color == obj.color) or (self.color == None) or (obj.color == None)
 
-        return nodes_eq and weights_eq #and colors_eq
+        return nodes_eq and weights_eq  # and colors_eq
 
 
-# Define a Graph Class for vizualisation 
+# Define a Graph Class for vizualisation
 class GraphVisualization:
-   
+
     def __init__(self):
         # Graph Object from networkx
         self.G = nx.Graph()
-          
+
         # List of edges
         self.edges = []
 
@@ -83,7 +86,7 @@ class GraphVisualization:
         self.nodes = []
 
     # add a single Node to the graph and update Union Find Structure
-    def addNode(self, nodeA : Node):
+    def addNode(self, nodeA: Node):
         """
         Add a sigle node to the graph
         """
@@ -91,10 +94,10 @@ class GraphVisualization:
         self.G.add_node(nodeA.ID)
         # Update Union Find Structure
         self.nodes.append(nodeA)
-          
+
     # addEdge function inputs the vertices of an
     # edge and appends it to the visual list
-    def addEdge(self, a : Node, b : Node, weight=None, color= None):
+    def addEdge(self, a: Node, b: Node, weight=None, color=None):
         """
         Add an edge to the graph
         Create a new edge if not already exist
@@ -102,13 +105,13 @@ class GraphVisualization:
         """
 
         # Add edge to the graph
-        self.G.add_edge(a.ID,b.ID, weight=weight, color=color)
+        self.G.add_edge(a.ID, b.ID, weight=weight, color=color)
 
         # Add edge to the list
-        self.edges.append(Edge(a,b,weight,color))
-    
+        self.edges.append(Edge(a, b, weight, color))
+
         # Add 2 Nodes with no parenting
-            # Check if the node already exist
+        # Check if the node already exist
 
         # REMOVE AUTO ADDING NODES TO GRAPH => Too long to compute
         # ADD NODES TO GRAPH BEFORE ADDING EDGES
@@ -129,7 +132,7 @@ class GraphVisualization:
             self.nodes.append(a)
         if not b_in:
             self.nodes.append(b) """
-          
+
     # visualize function draws the graph with matplotlib
     def visualize(self):
         nx.draw_networkx(self.G)
@@ -155,9 +158,13 @@ class GraphVisualization:
         - List of Node objects
         """
         L = []
-        for node in self.nodes:
-            if node == nodeA:
-                L.append(node)
+        # Iter over all edges
+        for edge in self.edges:
+            if edge.a == nodeA:
+                L.append(edge.b)
+            elif edge.b == nodeA:
+                L.append(edge.a)
+
         return L
 
     # Method to get the MST of the graph
@@ -165,7 +172,7 @@ class GraphVisualization:
         """
         Return the MST of the graph
         """
-        
+
         # Sort edges by weight
         self.edges.sort(key=lambda x: x.weight)
 
@@ -184,6 +191,52 @@ class GraphVisualization:
 
         return MST
 
+    # DFS Algorithm
+    def DFS(self, nodeA: Node, nodeB: Node):
+        """
+        Return the path between 2 nodes
+
+        ## Input :
+        - nodeA : Start Node 
+        - nodeB : End Node
+
+        ## Output :
+        - List of Node objects
+        """
+
+        # Use a stack to store the nodes to explore
+        stack = [nodeA]
+
+        # Use a list to store the path from nodeA to nodeB
+        path = []
+
+        # Use a list to store the nodes already explored
+        explored = [nodeA]
+
+        while len(stack) > 0:
+            # Current node to explore
+            node = stack.pop()
+            print(node)
+            path.append(node.ID)
+
+            # check if already at the end
+            if node == nodeB:
+                return path
+
+            # Get neighbors of the current node
+            neighbors = self.getNeighbors(node)
+            """ for element in neighbors:
+                print(element) """
+
+            # Add neighbors to the stack
+            for neighbor in neighbors:
+                if neighbor not in explored:
+                    stack.append(neighbor)
+                    explored.append(neighbor)
+            # add branch to the path
+
+        return path
+
 
 # --- Open File and create Graph ---
 
@@ -192,7 +245,7 @@ def file2Graph(path):
     Return a graph from a file
     """
 
-    # Open test file 
+    # Open test file
     file = open(path, 'r')
     lines = file.readlines()
 
@@ -222,15 +275,16 @@ def file2Graph(path):
         Node_a = int(entry[i][0])
         Node_b = int(entry[i][1])
         weight = int(entry[i][2])
-        a = Graph.nodes[Node_a-1]
-        b = Graph.nodes[Node_b-1]
-        Graph.addEdge(a,b,weight)
+        a = Graph.nodes[Node_a - 1]
+        b = Graph.nodes[Node_b - 1]
+        Graph.addEdge(a, b, weight)
 
     return Graph
 
 # Can't visualise graph 2 to 9 => too big, more than 100 000 Nodes...
 
 # --- Display Both Graphs and MST ---
+
 
 def compareGraphs(Graph, **kwargs):
     """
@@ -251,7 +305,6 @@ def compareGraphs(Graph, **kwargs):
     display_weights_MST = kwargs.get('display_weights_MST', False)
     same_pos = kwargs.get('same_pos', False)
 
-
     if display_MST:
         # Create a new Graph visualization object corresponding to the MST of the Graph
         MST = Graph.Kruskal()
@@ -259,20 +312,20 @@ def compareGraphs(Graph, **kwargs):
     # -- Caracteristics of the Graph --
 
     # Position of the nodes
-    # get the position of the nodes once and for all 
+    # get the position of the nodes once and for all
 
     pos = nx.spring_layout(Graph.G)
 
     # Edges of the Graph
-        # weights
+    # weights
 
     edge_labels = {}
     if display_weights:
-        edge_labels = nx.get_edge_attributes(Graph.G,'weight')
+        edge_labels = nx.get_edge_attributes(Graph.G, 'weight')
 
     edge_labels_MST = {}
     if display_weights_MST:
-        edge_labels_MST = nx.get_edge_attributes(MST.G,'weight')
+        edge_labels_MST = nx.get_edge_attributes(MST.G, 'weight')
 
     # Visualize
     plt.figure(1)
@@ -281,29 +334,78 @@ def compareGraphs(Graph, **kwargs):
 
     if display_MST:
         plt.figure(2)
-        if not(same_pos):
+        if not (same_pos):
             pos = nx.spring_layout(MST.G)
-        nx.draw_networkx(MST.G, node_color='r', edge_color='r',pos=pos)
+        nx.draw_networkx(MST.G, node_color='r', edge_color='r', pos=pos)
         nx.draw_networkx_edge_labels(Graph.G, pos, edge_labels_MST)
-    
+
     plt.show()
 
-# RUN TEST on  ./tests/tests/itinerariesX.in
-# with X from 0 to 9
-path = 'tests/tests/itineraries.'
+# --- Test0 ---
 
-ID = 1
-#print('Test ' + str(ID))
-#Graph = file2Graph(path + str(ID) + '.in')
-#Graph.visualize()
-#compareGraphs(Graph, display_MST = True, display_weights_MST = True, same_pos = False)
+
+def test0():
+    # RUN TEST on  ./tests/tests/itinerariesX.in
+    # with X from 0 to 9
+    path = 'tests/tests/itineraries.'
+    ID = 1
+    print('Open Graph  ' + str(ID))
+    Graph = file2Graph(path + str(ID) + '.in')
+    return Graph
 
 # --- Test 1 ---
 
-E1 = Edge(Node(1),Node(2))
-E2 = Edge(Node(1),Node(2),2)
-E3 = Edge(Node(2),Node(1))
 
-print(E1==E2)
-print(E1==E3)
-print(E2==E3)
+def test1():
+    E1 = Edge(Node(1), Node(2))
+    E2 = Edge(Node(1), Node(2), 2)
+    E3 = Edge(Node(2), Node(1))
+
+    print(E1 == E2)
+    print(E1 == E3)
+    print(E2 == E3)
+
+
+# --- Test 2 ---
+
+
+def test2(Graph):
+    """
+    Display MST
+    """
+    MST = Graph.Kruskal()
+    MST.visualize()
+
+
+def test3(Graph):
+    """
+    Display Graph and MST
+    """
+    print("Display Graph and MST")
+    compareGraphs(Graph, display_MST=True, display_weights=True,
+                  display_weights_MST=True, same_pos=False)
+
+
+def test4(Graph):
+    print("Test Neighbors")
+    nodeA = Graph.nodes[0]
+    for element in Graph.getNeighbors(nodeA):
+        print(element)
+
+
+def test5(Graph):
+    print("Test DFS")
+    nodeA = Graph.nodes[0]
+    nodeB = Graph.nodes[14]
+    MST = Graph.Kruskal()
+    pathway = MST.DFS(nodeA, nodeB)
+    print(pathway)
+    MST.visualize()
+
+# --- Run Main ---
+
+
+if __name__ == "__main__":
+
+    G = test0()
+    test5(G)
