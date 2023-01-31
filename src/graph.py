@@ -31,6 +31,15 @@ class Node:
     def __str__(self):
         return 'Node ' + str(self.ID)
 
+    def __eq__(self,obj):
+        """
+        Overriding the default Equals behavior
+        Compare ID of Nodes
+            - Doesn't compare parents (Union Find Structure)
+        """
+
+        return self.ID == obj.ID
+
 # Define an Edge Class 
 class Edge():
 
@@ -43,7 +52,23 @@ class Edge():
     def __str__(self):
         return 'Edge : ' + str(self.a) + ' - ' + str(self.b) + ' | weight : ' + str(self.weight) + ' | color : ' + str(self.color)
 
-  
+    def __eq__(self, obj):
+        """
+        Overriding the default Equals behavior
+        Compare ID of Nodes 
+            - if weights, also compares
+            - Doesn't compare colors of edges
+
+        Depends on the Node method __eq__ 
+        """
+
+        nodes_eq = (self.a == obj.a and self.b == obj.b) or (self.a == obj.b and self.b == obj.a)
+        weights_eq = (self.weight == obj.weight) or (self.weight == None) or (obj.weight == None)
+        #colors_eq = (self.color == obj.color) or (self.color == None) or (obj.color == None)
+
+        return nodes_eq and weights_eq #and colors_eq
+
+
 # Define a Graph Class for vizualisation 
 class GraphVisualization:
    
@@ -117,6 +142,24 @@ class GraphVisualization:
         """
         return self.G.nodes()
 
+    # Return neighbors of a node
+    def getNeighbors(self, nodeA: Node):
+        """
+        Gives the neighbors of a node
+
+
+        ## Input : 
+        - Node object
+
+        ## Output :
+        - List of Node objects
+        """
+        L = []
+        for node in self.nodes:
+            if node == nodeA:
+                L.append(node)
+        return L
+
     # Method to get the MST of the graph
     def Kruskal(self):
         """
@@ -140,6 +183,7 @@ class GraphVisualization:
                 edge.a.union(edge.b)
 
         return MST
+
 
 # --- Open File and create Graph ---
 
@@ -190,14 +234,14 @@ def file2Graph(path):
 
 def compareGraphs(Graph, **kwargs):
     """
-    Input : 
+    ## Input : 
     - Graph : GraphVisualization object
     - display_MST : Boolean (default False)
     - display_weights : Boolean (default False)
     - display_weights_MST : Boolean (default False)    
     - same_pos : Boolean (default False)
 
-    Output: 
+    ## Output: 
     - Visualize both the Graph and the Minimum Spanning Tree
     """
 
@@ -250,6 +294,16 @@ path = 'tests/tests/itineraries.'
 
 ID = 1
 #print('Test ' + str(ID))
-Graph = file2Graph(path + str(ID) + '.in')
+#Graph = file2Graph(path + str(ID) + '.in')
 #Graph.visualize()
-compareGraphs(Graph, display_MST = True, display_weights_MST = True, same_pos = False)
+#compareGraphs(Graph, display_MST = True, display_weights_MST = True, same_pos = False)
+
+# --- Test 1 ---
+
+E1 = Edge(Node(1),Node(2))
+E2 = Edge(Node(1),Node(2),2)
+E3 = Edge(Node(2),Node(1))
+
+print(E1==E2)
+print(E1==E3)
+print(E2==E3)
