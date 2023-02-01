@@ -199,7 +199,7 @@ class GraphVisualization:
         return MST
 
     # DFS Algorithm
-    def DFS(self, nodeA: Node, nodeB: Node):
+    def itineraries_v1(self, nodeA: Node, nodeB: Node):
         """
         Return the path between 2 nodes
 
@@ -447,7 +447,7 @@ def test5(Graph):
     nodeA = Graph.nodes[0]
     nodeB = Graph.nodes[17]
     MST = Graph.Kruskal()
-    pathway = MST.DFS(nodeA, nodeB)
+    pathway = MST.itineraries_v1(nodeA, nodeB)
     print(pathway)
     MST.visualize()
 
@@ -460,7 +460,7 @@ def test6(Graph, queries: list):
     for query in queries:
         nodeA = Graph.nodes[query[0] - 1]
         nodeB = Graph.nodes[query[1] - 1]
-        pathway = MST.DFS(nodeA, nodeB)
+        pathway = MST.itineraries_v1(nodeA, nodeB)
         print('Pathway from ' + str(nodeA.ID) + ' to ' + str(nodeB.ID) + ' : ', end='')
         print(pathway)
     MST.visualize()
@@ -471,4 +471,3 @@ if __name__ == "__main__":
     G = getGraph()
     queries = getQueries()
     test6(G, queries)
-
