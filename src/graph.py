@@ -296,6 +296,34 @@ def file2Graph(path):
 
     return Graph
 
+
+def file2Querries(path):
+    """
+    Return List of querries from a file
+    """
+    file = open(path, 'r')
+    lines = file.readlines()
+
+    entry = []
+    for line in lines:
+        entry.append(line.strip().split())
+
+    # Close file
+    file.close()
+
+    # Get Number of Nodes and Edges (n,m)
+    n = int(entry[0][0])
+    m = int(entry[0][1])
+
+    # Remove from 1st line to m+1 as they are edges
+    entry = entry[m + 1:]
+    # Number of queries
+    e = int(entry[0][0])
+    entry.pop(0)
+    # Get ID of Nodes
+    entry = [list(map(int, i)) for i in entry]
+    return (n, m, e, entry)
+
 # Can't visualise graph 2 to 9 => too big, more than 100 000 Nodes...
 
 # --- Display Both Graphs and MST ---
@@ -356,10 +384,10 @@ def compareGraphs(Graph, **kwargs):
 
     plt.show()
 
-# --- Test0 ---
+# --- GET INPUT ---
 
 
-def test0():
+def getGraph():
     # RUN TEST on  ./tests/tests/itinerariesX.in
     # with X from 0 to 9
     path = 'tests/tests/itineraries.'
@@ -368,7 +396,16 @@ def test0():
     Graph = file2Graph(path + str(ID) + '.in')
     return Graph
 
-# --- Test 1 ---
+
+def getQueries():
+    # RUN TEST on  ./tests/tests/itinerariesX.in
+    # with X from 0 to 9
+    path = 'tests/tests/itineraries.'
+    ID = 1
+    print('Getting Queries From Test  ' + str(ID))
+    queries = file2Querries(path + str(ID) + '.in')
+    return queries
+# --- Tests ---
 
 
 def test1():
@@ -379,9 +416,6 @@ def test1():
     print(E1 == E2)
     print(E1 == E3)
     print(E2 == E3)
-
-
-# --- Test 2 ---
 
 
 def test2(Graph):
@@ -418,14 +452,23 @@ def test5(Graph):
     MST.visualize()
 
 
-def test6(Graph):
-    # Get query from file
+def test6(Graph, queries: list):
 
-    # --- Run Main ---
-    pass
+    print("Test Itineraries")
+    queries = queries[3]
+    MST = Graph.Kruskal()
+    for query in queries:
+        nodeA = Graph.nodes[query[0] - 1]
+        nodeB = Graph.nodes[query[1] - 1]
+        pathway = MST.DFS(nodeA, nodeB)
+        print('Pathway from ' + str(nodeA.ID) + ' to ' + str(nodeB.ID) + ' : ', end='')
+        print(pathway)
+    MST.visualize()
 
 
 if __name__ == "__main__":
 
-    G = test0()
-    test5(G)
+    G = getGraph()
+    queries = getQueries()
+    test6(G, queries)
+
