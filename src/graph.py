@@ -2,6 +2,7 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
+from math import log2
 
 # DOC :
 # [LINK](https://networkx.org/documentation/stable/tutorial.html)
@@ -14,6 +15,8 @@ class Node:
         Node Object
         - ID : ID of the node
         - parent : Parent of the node in the Union Find Structure
+        - ancestor : List of the ancestor in the Union Find as power of 2
+            : [2^0 th = parent, 2^1 = parent of parent, 2^2, ...] while last element is the root of the tree
         """
 
         self.ID = ID
@@ -21,6 +24,7 @@ class Node:
             self.parent = self
         else:
             self.parent = parent
+        self.depth = 0
 
     def find(self):
         if self.parent != self:
@@ -213,6 +217,7 @@ class GraphVisualization:
 
         ## Output :
         - List of Node objects
+        - Integer : Maximum weight of the path
         """
 
         # USE DFS ALGORITHM
@@ -241,12 +246,20 @@ class GraphVisualization:
             if node == nodeB:
                 # compute path from nodeB to nodeA by reading parenting
                 path = []
+                max_weight = 0
+                weight = 0
                 while node != nodeA:
                     path.append(node.ID)
                     node = node.parent
+                    # get weight of the edge between node and node.parent
+                    if node.parent != node:
+                        data = self.G.get_edge_data(node.ID, node.parent.ID)
+                        weight = data['weight']
+                    if weight > max_weight:
+                        max_weight = weight
                 path.append(nodeA.ID)
                 path.reverse()
-                return path
+                return path, max_weight
 
             # Get neighbors of the node
             neighbors = self.getNeighbors(node)
@@ -268,7 +281,28 @@ class GraphVisualization:
         - Node object
         """
 
-        pass
+        # if depthA > depthB, swap nodes
+        if nodeA.depth > nodeB.depth:
+            nodeA, nodeB = nodeB, nodeA
+
+        # get the difference in depth
+        diff = nodeB.depth - nodeA.depth
+
+        # move the deeper node up the tree
+        while diff > 0:
+            nodeB = nodeB.parent
+            diff -= 1
+
+        # now both nodes are at the same depth
+        # move both nodes up the tree until they are the same
+        while nodeA != nodeB:
+            nodeA = nodeA.parent
+            nodeB = nodeB.parent
+
+        # return the LCA
+        return nodeA
+
+    # Auxiliary function for LCA
 
     def ancestor(self, nodeA: Node, n: int):
         """
@@ -284,11 +318,10 @@ class GraphVisualization:
         - Node Object
         - maximum noise level of the path
         """
-        node = nodeA
-        for i in range(2**n):
-            node = node.parent
+        # sparse matrix of ancestors
+        # node.ancestor[n] = ancestor of node at distance 2^n
 
-        return node
+        pass
 
     def BFS(self, nodeA: Node):
         """
@@ -325,7 +358,12 @@ class GraphVisualization:
             for neighbor in neighbors:
                 if neighbor not in visited:
                     neighbor.parent = node
+                    neighbor.depth = node.depth + 1
                     queue.append(neighbor)
+
+        # Update the ancestor list of each node according to the size of the tree
+        for node in self.nodes:
+            node.ancestor = [None] * int(log2(len(self.nodes)))
 
 
 # --- Open File and create Graph ---
@@ -541,33 +579,43 @@ def test6(Graph, queries: list):
         print('Pathway from ', str(nodeA.ID),
               ' to ', str(nodeB.ID), ' : ', end='')
         print(pathway)
-    MST.visualize()
 
 
 def test7(Graph):
-    print("Test ancestor")
-    MST = Graph.Kruskal()
-    for j in range(len(MST.nodes)):
-        nodeA = MST.nodes[j]
-        for i in range(5):
-            ancestor = MST.ancestor(nodeA, i)
-            print(nodeA, "i = ", i, " : ", ancestor.ID, " parent : ", nodeA.parent)
-    # POURQUOI LA RACINE DE L'ARBRE C 6 BORDEL ?
-    # LA STRUCTURE UNION FIND EST A CHIER JE CROIS
-    MST.visualize()
-
-
-def test8(Graph):
     print("Test BFS")
     MST = Graph.Kruskal()
     nodeA = Graph.nodes[0]
     MST.BFS(nodeA)
-    for j in range(len(MST.nodes)):
-        nodeA = MST.nodes[j]
-        for i in range(5):
-            ancestor = MST.ancestor(nodeA, i)
-            print(nodeA, "i = ", i, " : ", ancestor.ID)
+    for node in MST.nodes:
+        print(node, ' : Depth =', node.depth, ' : ', end='')
+        pointeur = node
+        for i in range(node.depth):
+            pointeur = pointeur.parent
+            print(pointeur, ', ', end=' ')
+        print()
     MST.visualize()
+
+
+def test8(Graph):
+    print("LCA")
+    MST = Graph.Kruskal()
+    # Update the depth of the nodes
+    MST.BFS(MST.nodes[0])
+    for nodeA in MST.nodes:
+        for nodeB in MST.nodes:
+            common_ancestor = MST.LCA(nodeA, nodeB)
+            print('Common Ancestor : ', nodeA, ' - ',
+                  nodeB, ': ', common_ancestor)
+    MST.visualize()
+
+
+def test9(Graph):
+    MST = Graph.Kruskal()
+    MST.BFS(MST.nodes[0])
+    nodeA = MST.nodes[18]
+    nodeB = MST.nodes[12]
+    common_ancestor = MST.LCA(nodeA, nodeB)
+    print('Common Ancestor : ', nodeA, ' - ', nodeB, ': ', common_ancestor)
 
 
 if __name__ == "__main__":
@@ -575,4 +623,5 @@ if __name__ == "__main__":
     G = getGraph()
     queries = getQueries()
     # test6(G, queries)
-    test8(G)
+    # test3(G)
+    # test8(G)
