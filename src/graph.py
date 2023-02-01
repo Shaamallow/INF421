@@ -284,6 +284,42 @@ class GraphVisualization:
 
         return node
 
+    def BFS(self, nodeA: Node):
+        """
+        Create a BFS tree from the MST
+
+        ## Input :
+        - nodeA : Root of the tree
+
+        ## Output :
+        - Graph object
+        """
+        # Create a queue
+        queue = []
+
+        # Create a list of visited nodes
+        visited = []
+
+        # Add the start node to the queue
+        queue.append(nodeA)
+
+        nodeA.parent = nodeA
+
+        while len(queue) > 0:
+            # Current node
+            node = queue.pop(0)
+
+            # Add node to visited list
+            visited.append(node)
+
+            # Get neighbors of the node
+            neighbors = self.getNeighbors(node)
+
+            for neighbor in neighbors:
+                if neighbor not in visited:
+                    neighbor.parent = node
+                    queue.append(neighbor)
+
 
 # --- Open File and create Graph ---
 
@@ -504,13 +540,26 @@ def test6(Graph, queries: list):
 def test7(Graph):
     print("Test ancestor")
     MST = Graph.Kruskal()
-    for j in range(len(Graph.nodes)):
-        nodeA = Graph.nodes[j]
+    for j in range(len(MST.nodes)):
+        nodeA = MST.nodes[j]
+        for i in range(5):
+            ancestor = MST.ancestor(nodeA, i)
+            print(nodeA, "i = ", i, " : ", ancestor.ID, " parent : ", nodeA.parent)
+    # POURQUOI LA RACINE DE L'ARBRE C 6 BORDEL ?
+    # LA STRUCTURE UNION FIND EST A CHIER JE CROIS
+    MST.visualize()
+
+
+def test8(Graph):
+    print("Test BFS")
+    MST = Graph.Kruskal()
+    nodeA = Graph.nodes[0]
+    MST.BFS(nodeA)
+    for j in range(len(MST.nodes)):
+        nodeA = MST.nodes[j]
         for i in range(5):
             ancestor = MST.ancestor(nodeA, i)
             print(nodeA, "i = ", i, " : ", ancestor.ID)
-    # POURQUOI LA RACINE DE L'ARBRE C 6 BORDEL ?
-    # LA STRUCTURE UNION FIND EST A CHIER JE CROIS
     MST.visualize()
 
 
@@ -519,4 +568,4 @@ if __name__ == "__main__":
     G = getGraph()
     queries = getQueries()
     # test6(G, queries)
-    test7(G)
+    test8(G)
