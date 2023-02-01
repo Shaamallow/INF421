@@ -279,7 +279,10 @@ class GraphVisualization:
 
         ## Output :
         - Node object
+        - Integer : Maximum weight of the path
         """
+
+        max_weight = 0
 
         # if depthA > depthB, swap nodes
         if nodeA.depth > nodeB.depth:
@@ -290,17 +293,39 @@ class GraphVisualization:
 
         # move the deeper node up the tree
         while diff > 0:
+
+            # get weight of the edge between node and node.parent
+            if nodeB.parent != nodeB:
+                data = self.G.get_edge_data(nodeB.ID, nodeB.parent.ID)
+                weight = data['weight']
+                if weight > max_weight:
+                    max_weight = weight
+
             nodeB = nodeB.parent
             diff -= 1
 
         # now both nodes are at the same depth
         # move both nodes up the tree until they are the same
         while nodeA != nodeB:
+
+            # get weight of the edge between node and node.parent
+            if nodeA.parent != nodeA:
+                data = self.G.get_edge_data(nodeA.ID, nodeA.parent.ID)
+                weight = data['weight']
+                if weight > max_weight:
+                    max_weight = weight
+
+            if nodeB.parent != nodeB:
+                data = self.G.get_edge_data(nodeB.ID, nodeB.parent.ID)
+                weight = data['weight']
+                if weight > max_weight:
+                    max_weight = weight
+
             nodeA = nodeA.parent
             nodeB = nodeB.parent
 
         # return the LCA
-        return nodeA
+        return nodeA, max_weight
 
     # Auxiliary function for LCA
 
@@ -605,7 +630,7 @@ def test8(Graph):
         for nodeB in MST.nodes:
             common_ancestor = MST.LCA(nodeA, nodeB)
             print('Common Ancestor : ', nodeA, ' - ',
-                  nodeB, ': ', common_ancestor)
+                  nodeB, ': ', common_ancestor[0], ' - ', common_ancestor[1])
     MST.visualize()
 
 
@@ -622,6 +647,7 @@ if __name__ == "__main__":
 
     G = getGraph()
     queries = getQueries()
-    # test6(G, queries)
+    test8(G)
+    G = getGraph()
+    test6(G, queries)
     # test3(G)
-    # test8(G)
