@@ -10,8 +10,14 @@ import matplotlib.pyplot as plt
 class Node:
 
     def __init__(self, ID, parent=None):
+        """
+        Node Object
+        - ID : ID of the node
+        - parent : Parent of the node in the Union Find Structure
+        """
+
         self.ID = ID
-        if parent == None:
+        if parent is None:
             self.parent = self
         else:
             self.parent = parent
@@ -56,17 +62,17 @@ class Edge():
     def __eq__(self, obj):
         """
         Overriding the default Equals behavior
-        Compare ID of Nodes 
+        Compare ID of Nodes
             - if weights, also compares
             - Doesn't compare colors of edges
 
-        Depends on the Node method __eq__ 
+        Depends on the Node method __eq__
         """
 
         nodes_eq = (self.a == obj.a and self.b == obj.b) or (
             self.a == obj.b and self.b == obj.a)
         weights_eq = (self.weight == obj.weight) or (
-            self.weight == None) or (obj.weight == None)
+            self.weight is None) or (obj.weight is None)
         # colors_eq = (self.color == obj.color) or (self.color == None) or (obj.color == None)
 
         return nodes_eq and weights_eq  # and colors_eq
@@ -76,6 +82,7 @@ class Edge():
 class GraphVisualization:
 
     def __init__(self):
+
         # Graph Object from networkx
         self.G = nx.Graph()
 
@@ -151,13 +158,13 @@ class GraphVisualization:
         Gives the neighbors of a node
 
 
-        ## Input : 
+        ## Input :
         - Node object
 
         ## Output :
         - List of Node objects
         """
-        L = []
+        L: list[Node] = []
         # Iter over all edges
         for edge in self.edges:
             if edge.a == nodeA:
@@ -197,45 +204,53 @@ class GraphVisualization:
         Return the path between 2 nodes
 
         ## Input :
-        - nodeA : Start Node 
+        - nodeA : Start Node
         - nodeB : End Node
 
         ## Output :
         - List of Node objects
         """
 
-        # Use a stack to store the nodes to explore
-        stack = [nodeA]
+        # USE DFS ALGORITHM
+        # ITERATIVE VERSION
+        # PATH-TRACKING VERSION
 
-        # Use a list to store the path from nodeA to nodeB
-        path = []
+        # Create a stack
+        stack = []
 
-        # Use a list to store the nodes already explored
-        explored = [nodeA]
+        # Create a list of visited nodes
+        visited = []
+
+        # Add the start node to the stack
+        stack.append(nodeA)
+
+        nodeA.parent = nodeA
 
         while len(stack) > 0:
-            # Current node to explore
+            # Current node
             node = stack.pop()
-            print(node)
-            path.append(node.ID)
 
-            # check if already at the end
+            # Add node to visited list
+            visited.append(node)
+
+            # check if node is the end node
             if node == nodeB:
+                # compute path from nodeB to nodeA by reading parenting
+                path = []
+                while node != nodeA:
+                    path.append(node.ID)
+                    node = node.parent
+                path.append(nodeA.ID)
+                path.reverse()
                 return path
 
-            # Get neighbors of the current node
+            # Get neighbors of the node
             neighbors = self.getNeighbors(node)
-            """ for element in neighbors:
-                print(element) """
 
-            # Add neighbors to the stack
             for neighbor in neighbors:
-                if neighbor not in explored:
+                if neighbor not in visited:
+                    neighbor.parent = node
                     stack.append(neighbor)
-                    explored.append(neighbor)
-            # add branch to the path
-
-        return path
 
 
 # --- Open File and create Graph ---
@@ -268,7 +283,7 @@ def file2Graph(path):
 
     # Add Nodes
     for i in range(n):
-        Graph.addNode(Node(i+1))
+        Graph.addNode(Node(i + 1))
 
     # Add Edges
     for i in range(m):
@@ -288,14 +303,14 @@ def file2Graph(path):
 
 def compareGraphs(Graph, **kwargs):
     """
-    ## Input : 
+    ## Input :
     - Graph : GraphVisualization object
     - display_MST : Boolean (default False)
     - display_weights : Boolean (default False)
-    - display_weights_MST : Boolean (default False)    
+    - display_weights_MST : Boolean (default False)
     - same_pos : Boolean (default False)
 
-    ## Output: 
+    ## Output:
     - Visualize both the Graph and the Minimum Spanning Tree
     """
 
@@ -396,13 +411,18 @@ def test4(Graph):
 def test5(Graph):
     print("Test DFS")
     nodeA = Graph.nodes[0]
-    nodeB = Graph.nodes[14]
+    nodeB = Graph.nodes[17]
     MST = Graph.Kruskal()
     pathway = MST.DFS(nodeA, nodeB)
     print(pathway)
     MST.visualize()
 
-# --- Run Main ---
+
+def test6(Graph):
+    # Get query from file
+
+    # --- Run Main ---
+    pass
 
 
 if __name__ == "__main__":
