@@ -252,8 +252,41 @@ class GraphVisualization:
                     neighbor.parent = node
                     stack.append(neighbor)
 
+    def LCA(self, nodeA: Node, nodeB: Node):
+        """
+        Return the LCA (Lowest Common Ancestor) of 2 nodes
+
+        ## Input :
+        - nodeA : Start Node
+        - nodeB : End Node
+
+        ## Output :
+        - Node object
+        """
+
+        pass
+
+    def ancestor(self, nodeA: Node, n: int):
+        """
+        Preprocessing : Compute the ancestor of each node at distance 2^n from nodeA
+
+        ## Input :
+        - nodeA : Start Node
+        - n : Distance (as a power of 2) => distance = 2^n
+
+        ## Output :
+        - Node Object
+        - maximum noise level of the path
+        """
+        node = nodeA
+        for i in range(2**n):
+            node = node.parent
+
+        return node
+
 
 # --- Open File and create Graph ---
+
 
 def file2Graph(path):
     """
@@ -423,6 +456,7 @@ def test2(Graph):
     Display MST
     """
     MST = Graph.Kruskal()
+    print(MST.nodes[0].find())
     MST.visualize()
 
 
@@ -461,8 +495,22 @@ def test6(Graph, queries: list):
         nodeA = Graph.nodes[query[0] - 1]
         nodeB = Graph.nodes[query[1] - 1]
         pathway = MST.itineraries_v1(nodeA, nodeB)
-        print('Pathway from ' + str(nodeA.ID) + ' to ' + str(nodeB.ID) + ' : ', end='')
+        print('Pathway from ', str(nodeA.ID),
+              ' to ', str(nodeB.ID), ' : ', end='')
         print(pathway)
+    MST.visualize()
+
+
+def test7(Graph):
+    print("Test ancestor")
+    MST = Graph.Kruskal()
+    for j in range(len(Graph.nodes)):
+        nodeA = Graph.nodes[j]
+        for i in range(5):
+            ancestor = MST.ancestor(nodeA, i)
+            print(nodeA, "i = ", i, " : ", ancestor.ID)
+    # POURQUOI LA RACINE DE L'ARBRE C 6 BORDEL ?
+    # LA STRUCTURE UNION FIND EST A CHIER JE CROIS
     MST.visualize()
 
 
@@ -470,4 +518,5 @@ if __name__ == "__main__":
 
     G = getGraph()
     queries = getQueries()
-    test6(G, queries)
+    # test6(G, queries)
+    test7(G)
