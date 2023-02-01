@@ -175,9 +175,13 @@ class GraphVisualization:
         return L
 
     # Method to get the MST of the graph
+    # TODO : Compute properly the MST with the Union Find Structure instead of updating it with BFS algorithm afterward...
     def Kruskal(self):
         """
         Return the MST of the graph
+
+        ## Output :
+        - GraphVisualization object : MST of the graph
         """
 
         # Sort edges by weight
@@ -269,6 +273,8 @@ class GraphVisualization:
     def ancestor(self, nodeA: Node, n: int):
         """
         Preprocessing : Compute the ancestor of each node at distance 2^n from nodeA
+        Ancestor is the 2^n_th parent of the Node going up the tree
+        If the distance is too long, the ancestor is the root of the tree
 
         ## Input :
         - nodeA : Start Node
@@ -286,7 +292,8 @@ class GraphVisualization:
 
     def BFS(self, nodeA: Node):
         """
-        Create a BFS tree from the MST
+        Use BFS algorithm to compute the parenting of each node from the Tree
+        Kruskal should have done it but it's not working properly...
 
         ## Input :
         - nodeA : Root of the tree
